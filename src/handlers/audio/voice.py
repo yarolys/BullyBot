@@ -4,34 +4,31 @@ from src.config import bot
 import speech_recognition as sr
 from pydub import AudioSegment
 import os
+from src.handlers.audio.celery_cfg import process_voice_task
 
 r = sr.Recognizer()
 router = Router()
 
+
 @router.message(F.voice)
 async def converting_voice_to_text(message: Message):
 
-    file_name = f'{message.voice.file_id}.ogg'
-    await bot.download(message.voice.file_id, file_name)
+    download_dir = 'downloads/'
+    os.makedirs(download_dir, exist_ok=True)
 
-    try:
-        audio = AudioSegment.from_ogg(file_name)
-        wav_file_name = file_name.replace('.ogg', '.wav')
-        audio.export(wav_file_name, format="wav")
-    except Exception as e:
-        await message.answer(f"Ошибка при конвертации аудио: {e}")
-        return
 
-    with sr.AudioFile(wav_file_name) as source:
-        audio = r.record(source)
+    file_name = os.path.join(download_dir, f"{message.voice.file_id}.ogg")
 
-    try:
-        text = r.recognize_google(audio, language='ru-RU')
-        await message.answer(f"Текст: {text}")
-    except sr.UnknownValueError:
-        await message.answer("Не удалось распознать речь.")
-    except sr.RequestError as e:
-        await message.answer(f"Ошибка при обращении к сервису распознавания: {e}")
+    voice = await bot.get_file(message.voice.file_id)
+    file_path = voice.file_path
+    await bot.download_file(file_path, file_name)
 
-    os.remove(file_name)
-    os.remove(wav_file_name)
+    task = process_voice_task.apply_async(args=[file_name])
+    await message.answer("Ваша аудиозапись обрабатывается...")
+
+    result = task.get(timeout=30)
+
+    if result['status'] == 'success':
+        await message.answer(f"Текст: {result['text']}")
+    else:
+        await message.answer(f"Ошибка: {result['error']}")
