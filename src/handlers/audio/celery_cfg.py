@@ -45,7 +45,7 @@ def process_voice_task(file_id: str):
 
     try:
 
-        text = r.recognize_google(audio, language='ru-RU')
+        text = r.recognize_google(audio, language='ru-RU') # noqa
         os.remove(file_name)
         os.remove(wav_file_name)
         logging.debug(f"Распознавание успешно: {text}")
