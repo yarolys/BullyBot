@@ -17,7 +17,7 @@ async def admin_panel(message: Message, state: FSMContext):
     if message.from_user.id == BOT_ADMIN_ID:
         await message.answer(
             'Добро пожаловать в меню администратора!',
-            reply_markup=await admin_panel_kb
+            reply_markup=admin_panel_kb
         )
         logger.debug(f'Пользователь {message.from_user.full_name} вошел в админ панель')
         await state.clear()
