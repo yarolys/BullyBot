@@ -1,15 +1,11 @@
-# Используем официальный образ Python в качестве базового
-FROM python:3.12-slim
-
-# Устанавливаем рабочую директорию внутри контейнера
+FROM python:3.12
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    && apt-get clean
+RUN pip install --no-cache-dir poetry
 WORKDIR /app
-
-# Копируем файлы зависимостей и устанавливаем их
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Копируем весь код приложения
+COPY pyproject.toml poetry.lock ./
+RUN poetry config virtualenvs.create false && poetry install --no-root
 COPY . .
 
-# Указываем команду по умолчанию
-CMD ["python3", "run.py"]
+# CMD ["celery", "-A", "src.handlers.audio.celery_cfg.app", "worker", "--loglevel=info"]
