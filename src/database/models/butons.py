@@ -33,3 +33,4 @@ class Button(Base):
         async with async_session_maker() as session:
             await session.execute(delete(cls).where(cls.id == button_id))
             await session.commit()
+            
