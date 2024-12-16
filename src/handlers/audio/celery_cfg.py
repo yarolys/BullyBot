@@ -1,15 +1,16 @@
 import os
-import logging
+import logging  # loguru
 from celery import Celery
 import speech_recognition as sr
 from pydub import AudioSegment
 
-
 logging.basicConfig(level=logging.DEBUG)
 
-app = Celery('audio_recognition', broker='redis://localhost:6379/0')
+redis_broker = os.getenv('REDIS_BROKER', 'redis://localhost:6379/0')
+redis_backend = os.getenv('REDIS_BACKEND', 'redis://localhost:6379/0')
 
-app.conf.result_backend = 'redis://localhost:6379/0'
+app = Celery('audio_recognition', broker=redis_broker)
+app.conf.result_backend = redis_backend
 
 app.conf.update(
     broker_connection_retry_on_startup=True
@@ -45,7 +46,7 @@ def process_voice_task(file_id: str):
 
     try:
 
-        text = r.recognize_google(audio, language='ru-RU') # noqa
+        text = r.recognize_google(audio, language='ru-RU')
         os.remove(file_name)
         os.remove(wav_file_name)
         logging.debug(f"Распознавание успешно: {text}")
