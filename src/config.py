@@ -10,7 +10,7 @@ load_dotenv()
 logger.add(
     'logs/log.log',
     format='{time:YYYY-mm-dd HH:mm:ss.SSSS}',
-    level=os.getenv('LOG_LEVEL'),
+    level=os.getenv('LOG_LEVEL', 'INFO'),
     rotation='50MB'
 )
 
