@@ -12,7 +12,7 @@ admin_panel_kb = ReplyKeyboardMarkup(
         [KeyboardButton(text='Изменить приветственное сообщение')],
         [KeyboardButton(text='Просмотреть добавленные звуки')],
         [KeyboardButton(text='Добавить новый звук'),
-        KeyboardButton(text='Меню удаления звуков')],
+        KeyboardButton(text='Меню удаления звука')],
     ],
     resize_keyboard=True
 )
