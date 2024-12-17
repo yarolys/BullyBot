@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, LargeBinary
 from sqlalchemy.orm import Mapped, mapped_column
 from src.database.connection import Base, async_session_maker
 from src.schemas import SoundSchema
@@ -9,7 +9,7 @@ class Sound(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(unique=True, nullable=False)
-    file_data: Mapped[bytes] = mapped_column(nullable=False)
+    file_data: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
 
 
     @classmethod
