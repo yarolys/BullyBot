@@ -10,7 +10,7 @@ from src.states.admin import FSM_DynamicPrompt, FSM_StaticPrompt
 from src.database.models import DbButton
 from src.config import logger
 from src.schemas import ButtonTypeEnum as BTE
-from src.utils.keyboard.admin import add_audio_kb, admin_panel_kb
+from src.utils.keyboard.admin import add_audio_kb, admin_panel_kb, main_menu
 
 
 router = Router()
@@ -27,13 +27,13 @@ async def start_sound_workflow(message: Message):
 
 
 @router.message(
-    F.text == 'Добавить динамический звук',
-    FSM_DynamicPrompt.working_with_prompts,
-    AdminRoleFilter()
+    AdminRoleFilter(),
+    F.text == 'Добавить динамический звук'
 )
 @logger.catch
 async def add_new_sound_prompt(message: Message, state: FSMContext):
-    await message.answer('Пожалуйста назовите ваш звук(не более 20 букв).')
+    await message.answer('Пожалуйста назовите ваш звук(не более 20 букв).',
+                         reply_markup=main_menu)
     await state.set_state(FSM_DynamicPrompt.get_prompt_name)
 
 
@@ -51,26 +51,34 @@ async def receive_sound_name(message: Message, state: FSMContext):
     await state.set_state(FSM_DynamicPrompt.get_prompt_file)
 
 
-@router.message(F.audio, FSM_DynamicPrompt.get_prompt_file)
+@router.message(F.audio | F.voice | F.document, FSM_DynamicPrompt.get_prompt_file)
 @logger.catch
 async def save_sound(message: Message, state: FSMContext):
     try:
         data = await state.get_data()
         sound_name = data.get("sound_name")
-        audio_file_id = message.audio.file_id
+        if message.audio:
+            file_id = message.audio.file_id
+        elif message.voice:
+            file_id = message.voice.file_id
+        elif message.document:
+            file_id = message.document.file_id
+        else:
+            await message.answer("Не удалось распознать файл.")
+            return
 
-        file_data = await message.bot.download_file_by_id(audio_file_id)
-        file_bytes = await file_data.read()
+        file = await message.bot.get_file(file_id)
+        file_path = file.file_path
+        file_bytes = await message.bot.download(file_path)
+        file_content = file_bytes.read()
+        await DbSound.add_sound(name=sound_name, file_data=file_content)
+        await message.answer(f"Звук '{sound_name}' успешно добавлен в базу данных!", reply_markup=admin_panel_kb)
 
-        await DbSound.add_sound(name=sound_name, file_data=file_bytes)
-
-        await message.answer(f"Звук '{sound_name}'успешно добавлен!", reply_markup=admin_panel_kb)
         await state.clear()
     except Exception as e:
-        logger.error(f"Ошибка при сохранении звука: {e}")
+        logger.error(f"Ошибка при сохранении звука в БД: {e}")
         await message.answer("Произошла ошибка при добавлении звука. Попробуйте еще раз.")
         await state.clear()
-
 
 @router.message(F.text == 'Добавить статический звук', AdminRoleFilter)
 @logger.catch
