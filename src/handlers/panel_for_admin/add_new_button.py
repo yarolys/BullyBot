@@ -5,7 +5,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 from src.database.models import DbSound
-from src.utils.keyboard.admin import get_prompts_for_delete
 from src.utils.filter import AdminRoleFilter
 from src.states.admin import FSM_DynamicPrompt, FSM_StaticPrompt
 from src.database.models import DbButton
@@ -17,9 +16,6 @@ from src.utils.keyboard.admin import add_audio_kb, admin_panel_kb
 router = Router()
 
 
-
-
-
 @router.message(F.text == 'Добавить новый звук', AdminRoleFilter())
 @logger.catch
 async def start_sound_workflow(message: Message):
@@ -28,8 +24,6 @@ async def start_sound_workflow(message: Message):
         reply_markup=add_audio_kb
     )
     await message.delete()
-
-
 
 
 @router.message(
@@ -78,50 +72,6 @@ async def save_sound(message: Message, state: FSMContext):
         await state.clear()
 
 
-
-
-
-@router.message(
-    F.text == 'Удалить звук',
-    FSM_DynamicPrompt.working_with_prompts,
-    AdminRoleFilter()
-)
-@logger.catch
-async def prepare_static_buttons(message: Message, state: FSMContext):
-    r = await message.answer(
-        'ВНИМАНИЕ!\n'
-        'Любое нажатие на кнопку - удалит её\n\n'
-        'Этот режим автоматически выключится через 15 секунд',
-    )
-    await asyncio.sleep(5)
-    await r.delete()
-    await state.set_state(FSM_DynamicPrompt.delete_prompt)
-    r = await message.answer(
-        'Удалить лишние кнопки',
-        reply_markup=(await get_prompts_for_delete(dynamic=True))
-    )
-    await asyncio.sleep(15)
-    await r.delete()
-    await state.set_state(FSM_DynamicPrompt.working_with_prompts)
-    await message.delete()
-
-
-@router.callback_query(
-    FSM_DynamicPrompt.delete_prompt,
-    AdminRoleFilter()
-)
-@logger.catch
-async def delete_static_prompt(qq: CallbackQuery):
-    await DbSound.delete_prompt(int(qq.data))
-    await qq.message.edit_reply_markup(
-        reply_markup=(await get_prompts_for_delete(dynamic=True))
-    )
-
-
-
-
-
-
 @router.message(F.text == 'Добавить статический звук', AdminRoleFilter)
 @logger.catch
 async def add_static_button_prompt(message: Message, state: FSMContext):
@@ -133,7 +83,7 @@ async def add_static_button_prompt(message: Message, state: FSMContext):
 async def receive_static_sound_name(message: Message, state: FSMContext):
     button_name = message.text
     if len(button_name) > 20:
-        await message.answer('Название кнопки не может превышать 20 буква. Попробуйте еще раз.')
+        await message.answer('Название кнопки не может превышать 20 букв. Попробуйте еще раз.')
     await state.update_data(button_name=button_name)
     await message.answer("Теперь отправь аудиофайл не более 1 минуты")
     await state.set_state(FSM_StaticPrompt.get_prompt_text)
