@@ -33,10 +33,11 @@ def upgrade() -> None:
     sa.Column('welcome_message', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('sounds',
+    op.create_table(
+    'sounds',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('file_data', sa.LargeBinary(), nullable=False),
+    sa.Column('file_id', sa.String(), nullable=False),  
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
