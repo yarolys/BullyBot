@@ -7,9 +7,9 @@ from src.handlers import (
     join2group_router,
     voice_router,
     admin_panel_router,
-    add_new_button_router,
-    check_add_buttons_router,
-    delete_button_router,
+    add_sound_router,
+    check_sounds_router,
+    delete_sound_router,
     welcome_message_router
 
 
@@ -23,9 +23,9 @@ async def main():
         join2group_router,
         voice_router,
         admin_panel_router,
-        add_new_button_router,
-        check_add_buttons_router,
-        delete_button_router,
+        add_sound_router,
+        check_sounds_router,
+        delete_sound_router,
         welcome_message_router
 
     )
