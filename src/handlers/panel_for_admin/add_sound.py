@@ -1,17 +1,11 @@
-import asyncio
-
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
-
-from src.database.models import DbSound
 from src.utils.filter import AdminRoleFilter
-from src.states.admin import FSM_DynamicPrompt, FSM_StaticPrompt
-from src.database.models import DbButton
-from src.config import logger
-from src.schemas import ButtonTypeEnum as BTE
+from src.states.admin import FSM_DynamicPrompt
+from src.database.models import DbSound
 from src.utils.keyboard.admin import add_audio_kb, admin_panel_kb, main_menu
-
+from src.config import logger
 
 router = Router()
 
@@ -20,20 +14,19 @@ router = Router()
 @logger.catch
 async def start_sound_workflow(message: Message):
     await message.answer(
-        'Работа с добавлением аудио',
+        "Работа с добавлением аудио",
         reply_markup=add_audio_kb
     )
     await message.delete()
 
 
-@router.message(
-    AdminRoleFilter(),
-    F.text == 'Добавить динамический звук'
-)
+@router.message(AdminRoleFilter(), F.text == 'Добавить звук')
 @logger.catch
 async def add_new_sound_prompt(message: Message, state: FSMContext):
-    await message.answer('Пожалуйста назовите ваш звук(не более 20 букв).',
-                         reply_markup=main_menu)
+    await message.answer(
+        "Пожалуйста, назовите ваш звук (не более 20 символов).",
+        reply_markup=main_menu
+    )
     await state.set_state(FSM_DynamicPrompt.get_prompt_name)
 
 
@@ -41,13 +34,17 @@ async def add_new_sound_prompt(message: Message, state: FSMContext):
 @logger.catch
 async def receive_sound_name(message: Message, state: FSMContext):
     sound_name = message.text
-    
     if len(sound_name) > 20:
         await message.answer("Название звука не может превышать 20 символов. Попробуйте снова.")
         return
     
+    existing_sound = await DbSound.get_sound_by_name(sound_name)
+    if existing_sound:
+        await message.answer(f"Звук с названием '{sound_name}' уже существует. Пожалуйста, выберите другое название.")
+        return
+    
     await state.update_data(sound_name=sound_name)
-    await message.answer("Теперь отправь аудио файл (не более 1 минуты).")
+    await message.answer("Теперь отправь аудио файл (в формате Audio, Voice или Document).")
     await state.set_state(FSM_DynamicPrompt.get_prompt_file)
 
 
@@ -57,63 +54,32 @@ async def save_sound(message: Message, state: FSMContext):
     try:
         data = await state.get_data()
         sound_name = data.get("sound_name")
-        if message.audio:
-            file_id = message.audio.file_id
-        elif message.voice:
-            file_id = message.voice.file_id
-        elif message.document:
-            file_id = message.document.file_id
-        else:
-            await message.answer("Не удалось распознать файл.")
+        file_id = message.audio.file_id if message.audio else \
+                  message.voice.file_id if message.voice else \
+                  message.document.file_id
+        
+        existing_sound_by_file = await DbSound.get_sound_by_file_id(file_id)
+        if existing_sound_by_file:
+            await message.answer("Этот звук уже добавлен в базу данных. Повторное добавление невозможно.")
+            await state.clear()
             return
+        
 
-        file = await message.bot.get_file(file_id)
-        file_path = file.file_path
-        file_bytes = await message.bot.download(file_path)
-        file_content = file_bytes.read()
-        await DbSound.add_sound(name=sound_name, file_data=file_content)
-        await message.answer(f"Звук '{sound_name}' успешно добавлен в базу данных!", reply_markup=admin_panel_kb)
-
+        await DbSound.add_sound(name=sound_name, file_id=file_id)
+        await message.answer(f"Звук '{sound_name}' успешно добавлен!", reply_markup=admin_panel_kb)
         await state.clear()
     except Exception as e:
-        logger.error(f"Ошибка при сохранении звука в БД: {e}")
-        await message.answer("Произошла ошибка при добавлении звука. Попробуйте еще раз.")
+        logger.error(f"Ошибка при сохранении звука: {e}")
+        await message.answer("Произошла ошибка. Попробуйте снова.")
         await state.clear()
 
-@router.message(F.text == 'Добавить статический звук', AdminRoleFilter)
+
+@router.callback_query(F.data.startswith("voice_"))
 @logger.catch
-async def add_static_button_prompt(message: Message, state: FSMContext):
-    await message.answer('Введите название кнопки:')
-    await state.set_state(FSM_StaticPrompt.get_prompt_name)
-
-@router.message(F.text, FSM_StaticPrompt.get_prompt_name)
-@logger.catch
-async def receive_static_sound_name(message: Message, state: FSMContext):
-    button_name = message.text
-    if len(button_name) > 20:
-        await message.answer('Название кнопки не может превышать 20 букв. Попробуйте еще раз.')
-    await state.update_data(button_name=button_name)
-    await message.answer("Теперь отправь аудиофайл не более 1 минуты")
-    await state.set_state(FSM_StaticPrompt.get_prompt_text)
-
-@router.message(F.audio, FSM_StaticPrompt.get_prompt_text)
-@logger.catch
-async def save_sound_button(message: Message, state: FSMContext):
-    try:
-        data = await state.get_data()
-        button_name = data.get('button_name')
-        audio_file_id = message.audio.file_id
-        file_data = await message.bot.download_file_by_id(audio_file_id)
-        file_bytes = await file_data.read()
-        sound = await DbSound.add_sound(name=button_name, file_data=file_bytes)
-
-
-        button_url = f"sound:{sound.id}"  
-        await DbButton.add_button(name=button_name, url=button_url, type=BTE.static)
-        await message.answer(f"Кнопка '{button_name}' с привязанным звуком успешно добавлена!", reply_markup=admin_panel_kb)
-        await state.clear()
-
-    except Exception as e:
-        logger.error(f"Ошибка при добавлении кнопки со звуком: {e}")
-        await message.answer("Произошла ошибка при добавлении кнопки со звуком. Попробуйте снова.")
-        await state.clear()
+async def send_voice(callback: CallbackQuery):
+    sound_id = callback.data.split("voice_")[1]
+    sound = await DbSound.get_sound_by_id(sound_id)
+    if sound:
+        await callback.message.answer_audio(sound.file_id)
+    else:
+        await callback.message.answer("Звук не найден.")
