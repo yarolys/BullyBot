@@ -35,9 +35,13 @@ class SettingsSchema(BaseModel):
     dynamic_button_count: int
     welcome_message: str
 
+from pydantic import BaseModel
+from pydantic.config import ConfigDict
+
+
 class SoundSchema(BaseModel):
     id: int
     name: str
-    file_data: bytes
+    file_id: str  
 
     model_config = ConfigDict(from_attributes=True)
