@@ -8,7 +8,7 @@ from src.database.models.sound import Sound
 
 router = Router()
 
-@router.message(F.text == 'Посмотреть добавленные звуки', AdminRoleFilter())
+@router.message(F.text == 'Просмотреть добавленные звуки', AdminRoleFilter())
 @logger.catch
 async def list_sounds(message: Message):
     sounds = await Sound.get_all_sounds()
