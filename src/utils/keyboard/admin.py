@@ -20,9 +20,8 @@ admin_panel_kb = ReplyKeyboardMarkup(
 # Меню добавления аудио
 add_audio_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text='Посмотреть добавленные звуки')],
-        [KeyboardButton(text='Добавить статический звук'),
-        KeyboardButton(text='Добавить динамический звук')],
+        [KeyboardButton(text='Просмотреть добавленные звуки')],
+        [KeyboardButton(text='Добавить звук')],
         [KeyboardButton(text='Вернуться в меню')]
     ],
     resize_keyboard=True
@@ -31,7 +30,7 @@ add_audio_kb = ReplyKeyboardMarkup(
 # Меню удаления аудио
 del_audio_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text='Посмотреть добавленные звуки')],
+        [KeyboardButton(text='Просмотреть добавленные звуки')],
         [KeyboardButton(text='Удалить звук')],
         [KeyboardButton(text='Вернуться в меню')]
     ],
