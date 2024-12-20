@@ -3,9 +3,6 @@ from datetime import datetime
 
 from pydantic import BaseModel, HttpUrl, ConfigDict
 
-class PromptTypeEnum(str, enum.Enum):
-    static = 'static'
-    dynamic = 'dynamic'
 
 class ButtonTypeEnum(str, enum.Enum):
     static = 'static'
