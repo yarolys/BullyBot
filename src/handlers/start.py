@@ -3,8 +3,8 @@ from aiogram.types import Message
 from aiogram.filters import Command
 
 from src.database.models import DbUser
-from src.config import BOT_ADMIN_ID
-from src.config import logger
+from src.config import BOT_ADMIN_ID, logger
+
 
 router = Router()
 
@@ -25,5 +25,6 @@ async def start(message: Message):
     )
     if message.from_user.id == BOT_ADMIN_ID:
         await message.answer('Для запуска админки нажми /admin')
-
+    else:
+        await message.answer('Для запуска пользовательского интерфейса, нажми /user')
     await message.delete()
