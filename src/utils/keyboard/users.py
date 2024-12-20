@@ -1,11 +1,18 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 
-user_panel_kb = ReplyKeyboardMarkup(
+users_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text='Пукнуть')],
-        [KeyboardButton(text='Пукнуть жидко...')],
-        [KeyboardButton(text='Пукнуть очень страшно .О.')],
-        [KeyboardButton(text='Н... Не пукать???')]
+    [KeyboardButton(text='Просмотреть добавленные звуки')],
+    [KeyboardButton(text='Добавить звук')]
     ],
-    resize_keyboard=True)
+    resize_keyboard=True
+)
+users_menu = ReplyKeyboardMarkup(
+    keyboard=[
+    [KeyboardButton(text='Вернуться обратно')]
+    ],
+    resize_keyboard=True
+)
+
+
