@@ -2,7 +2,7 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 from src.utils.filter import AdminRoleFilter
-from src.states.admin import FSM_DynamicPrompt
+from src.states.admin import FSM_Prompt
 from src.database.models import DbSound
 from src.utils.keyboard.admin import add_audio_kb, admin_panel_kb, main_menu
 from src.config import logger
@@ -20,17 +20,17 @@ async def start_sound_workflow(message: Message):
     await message.delete()
 
 
-@router.message(AdminRoleFilter(), F.text == 'Добавить звук')
+@router.message(F.text == 'Добавить звук')
 @logger.catch
 async def add_new_sound_prompt(message: Message, state: FSMContext):
     await message.answer(
         "Пожалуйста, назовите ваш звук (не более 20 символов).",
         reply_markup=main_menu
     )
-    await state.set_state(FSM_DynamicPrompt.get_prompt_name)
+    await state.set_state(FSM_Prompt.get_prompt_name)
 
 
-@router.message(F.text, FSM_DynamicPrompt.get_prompt_name)
+@router.message(F.text, FSM_Prompt.get_prompt_name)
 @logger.catch
 async def receive_sound_name(message: Message, state: FSMContext):
     sound_name = message.text
@@ -45,10 +45,10 @@ async def receive_sound_name(message: Message, state: FSMContext):
     
     await state.update_data(sound_name=sound_name)
     await message.answer("Теперь отправь аудио файл (в формате Audio, Voice или Document).")
-    await state.set_state(FSM_DynamicPrompt.get_prompt_file)
+    await state.set_state(FSM_Prompt.get_prompt_file)
 
 
-@router.message(F.audio | F.voice | F.document, FSM_DynamicPrompt.get_prompt_file)
+@router.message(F.audio | F.voice | F.document, FSM_Prompt.get_prompt_file)
 @logger.catch
 async def save_sound(message: Message, state: FSMContext):
     try:
