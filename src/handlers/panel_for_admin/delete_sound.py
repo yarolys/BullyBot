@@ -1,16 +1,23 @@
-from aiogram import F, Router
+from aiogram import Router, F
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery
-
-
 from src.utils.filter import AdminRoleFilter
-from src.states.admin import FSM_DynamicPrompt
+from src.database.models.sound import Sound  
 from src.config import logger
-from src.database.models.sound import Sound
-
-from src.utils.keyboard.admin import admin_panel_kb, del_audio_kb
-
+from src.utils.keyboard.admin import del_audio_kb
 router = Router()
+
+
+async def get_sounds_keyboard():
+    sounds = await Sound.get_all_sounds() 
+    if not sounds:
+        return None
+
+    buttons = [
+        [InlineKeyboardButton(text=sound.name, callback_data=f"delete_sound_{sound.id}")]
+        for sound in sounds
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
 @router.message(F.text == 'Меню удаления звука', AdminRoleFilter())
@@ -22,32 +29,27 @@ async def delete_prompts_workflow(message: Message):
     )
     await message.delete()
 
-@router.message(F.text == 'Удалить звук', AdminRoleFilter())
-@logger.catch
-async def delete_sound_prompt(message: Message, state: FSMContext):
-    sounds = await Sound.get_all_sounds()
-    if not sounds:
-        await message.answer("В БД пока нет звуков.")
+
+@router.message(F.text == "Удалить звук", AdminRoleFilter())
+async def show_sounds_for_deletion(message: Message):
+    keyboard = await get_sounds_keyboard()
+    if not keyboard:
+        await message.answer("Нет доступных звуков для удаления.")
         return
+
+    await message.answer("Выберите звук для удаления:", reply_markup=keyboard)
+
+
+@router.callback_query(F.data.startswith("delete_sound_"), AdminRoleFilter())
+async def delete_sound(callback: CallbackQuery):
+    sound_id = int(callback.data.split("_")[-1])  
+    await Sound.delete_sound(sound_id)  
+
+
+    new_keyboard = await get_sounds_keyboard()
+    if new_keyboard:
+        await callback.message.edit_reply_markup(reply_markup=new_keyboard)
+    else:
+        await callback.message.edit_text("Все звуки удалены.")
     
-    buttons = [
-        (sound.name, f"delete_sound:{sound.id}") for sound in sounds
-    ]
-    kb = del_audio_kb(buttons)
-    await message.answer("Выберите звук для удаления:", reply_markup=kb)
-    await state.set_state(FSM_DynamicPrompt.delete_prompt)
-
-
-@router.callback_query(F.data.startswith('delete_sound:'), FSM_DynamicPrompt.delete_prompt)
-@logger.catch
-async def delete_sound(callback: CallbackQuery, state: FSMContext):
-    sound_id = int(callback.data.split(":")[1])
-    try:
-        await Sound.delete_sound(sound_id)
-        await callback.message.edit_text("Звук успешно удален!", reply_markup=admin_panel_kb)
-        await state.clear()
-    except Exception as e:
-        logger.error(f"Ошибка при удалении звука:{e}")
-        await callback.message.answer("Произошла ошибка при удалении.")
-    
-
+    await callback.answer("Звук удалён.")
