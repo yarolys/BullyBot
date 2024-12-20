@@ -8,3 +8,4 @@ from .panel_for_admin.delete_sound import router as delete_sound_router
 from .panel_for_admin.welcome_message import router as welcome_message_router
 
 from .audio.voice import router as voice_router
+from .panel_for_admin.dynamic_buttons import router as dynamic_buttons_router
