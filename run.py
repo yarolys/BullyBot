@@ -11,7 +11,8 @@ from src.handlers import (
     check_sounds_router,
     delete_sound_router,
     welcome_message_router,
-    dynamic_buttons_router
+    dynamic_buttons_router,
+    static_buttons_router
 
 
 )
@@ -25,6 +26,7 @@ async def main():
         voice_router,
         admin_panel_router,
         dynamic_buttons_router,
+        static_buttons_router,
         add_sound_router,
         check_sounds_router,
         delete_sound_router,
