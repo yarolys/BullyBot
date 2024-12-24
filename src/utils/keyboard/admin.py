@@ -12,7 +12,7 @@ admin_panel_kb = ReplyKeyboardMarkup(
         [KeyboardButton(text='Изменить приветственное сообщение')],
         [KeyboardButton(text='Просмотреть добавленные звуки')],
         [KeyboardButton(text='Добавить новый звук'), KeyboardButton(text='Меню удаления звука')],
-        [KeyboardButton(text='Посмотреть кнопки')],
+        [KeyboardButton(text='Установить количество динамических кнопок')],
         [KeyboardButton(text='Статические кнопки'), KeyboardButton(text='Динамические кнопки')],
     ],
     resize_keyboard=True
@@ -55,23 +55,26 @@ main_menu = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
-# Получение кнопок
-async def get_buttons_kb(static: bool = False, dynamic: bool = False) -> InlineKeyboardMarkup | None:
+
+async def get_buttons_kb(static: bool = False, dynamic: bool = False):
     if not (static or dynamic):
         return None
+    keyboard = InlineKeyboardBuilder()
 
     buttons = await DbButton.get_all_buttons()
+    if static:
+        for kb_button in buttons:
+            if kb_button.type == BTE.static:
+                keyboard.button(text=kb_button.name, url=str(kb_button.url))
+    if dynamic:
+        for kb_button in buttons:
+            if kb_button.type == BTE.dynamic:
+                keyboard.button(text=kb_button.name, url=str(kb_button.url))
     if not buttons:
         return None
+    keyboard.adjust(1)
 
-    keyboard = InlineKeyboardMarkup()
-    for kb_button in buttons:
-        if static and kb_button.type == BTE.static:
-            keyboard.add(InlineKeyboardButton(text=kb_button.name, url=str(kb_button.url)))
-        if dynamic and kb_button.type == BTE.dynamic:
-            keyboard.add(InlineKeyboardButton(text=kb_button.name, url=str(kb_button.url)))
-
-    return keyboard if keyboard.inline_keyboard else None
+    return keyboard.as_markup()
 
 
 async def get_buttons_for_delete(static: bool = False, dynamic: bool = False):
@@ -91,6 +94,7 @@ async def get_buttons_for_delete(static: bool = False, dynamic: bool = False):
         return None
     keyboard.adjust(1)
     return keyboard.as_markup()
+
 
 async def get_prompts_for_delete():
     buttons = await DbSound.get_all_sounds()  
