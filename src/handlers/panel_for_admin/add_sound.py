@@ -44,7 +44,7 @@ async def receive_sound_name(message: Message, state: FSMContext):
         return
     
     await state.update_data(sound_name=sound_name)
-    await message.answer("Теперь отправь аудио файл (в формате Audio, Voice или Document).")
+    await message.answer("Теперь отправь аудио файл.")
     await state.set_state(FSM_Prompt.get_prompt_file)
 
 
