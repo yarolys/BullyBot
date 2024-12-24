@@ -4,7 +4,7 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 users_kb = ReplyKeyboardMarkup(
     keyboard=[
     [KeyboardButton(text='Просмотреть добавленные звуки')],
-    [KeyboardButton(text='Добавить звук')]
+    [KeyboardButton(text='Добавить звук!')]
     ],
     resize_keyboard=True
 )
