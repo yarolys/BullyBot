@@ -29,6 +29,13 @@ class Button(Base):
 
 
     @classmethod
+    async def add_button(cls, name: str, url: str, type: ButtonTypeEnum):
+        async with async_session_maker() as session:
+            session.add(cls(name=name, url=url, type=type))
+            await session.commit()
+
+
+    @classmethod
     async def delete_button(cls, button_id: int):
         async with async_session_maker() as session:
             await session.execute(delete(cls).where(cls.id == button_id))
