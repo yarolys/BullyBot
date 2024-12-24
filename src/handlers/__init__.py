@@ -10,3 +10,4 @@ from .panel_for_admin.welcome_message import router as welcome_message_router
 from .audio.voice import router as voice_router
 from .panel_for_admin.dynamic_buttons import router as dynamic_buttons_router
 from .panel_for_admin.static_buttons import router as static_buttons_router
+from .panel_for_user.user_panel import router as user_panel_router
