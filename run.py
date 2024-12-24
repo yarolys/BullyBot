@@ -4,6 +4,7 @@ from aiogram import Dispatcher
 from src.config import bot, logger
 from src.handlers import (
     start_router,
+    user_panel_router,
     join2group_router,
     voice_router,
     admin_panel_router,
@@ -22,6 +23,7 @@ async def main():
     dp = Dispatcher()
     dp.include_routers(
         start_router,
+        user_panel_router,
         join2group_router,
         voice_router,
         admin_panel_router,
