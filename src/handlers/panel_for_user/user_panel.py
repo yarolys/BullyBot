@@ -16,8 +16,9 @@ router = Router()
 
 @router.message(Command('user'))
 @router.message(F.text == 'Вернуться обратно')
-async def user_panel(message: Message):
+async def user_panel(message: Message, state: FSMContext):
     logger.debug(f'ID Пользователя: {message.from_user.id}')
+    await state.clear()
     await message.answer(
         'Добро пожаловать в меню пользователя!',
         reply_markup=users_kb
