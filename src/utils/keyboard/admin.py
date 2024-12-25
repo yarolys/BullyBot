@@ -5,7 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from src.schemas import ButtonTypeEnum as BTE
 from src.database.models import DbButton, DbSound
 
-# Админская панель
+
 admin_panel_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text='Посмотреть приветственное сообщение')],

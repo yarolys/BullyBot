@@ -13,7 +13,7 @@ async def list_sounds(message: Message):
         await message.answer("Пока что добавленных звуков нет.")
         return
 
-    # Создаем клавиатуру с кнопками в столбик
+
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text=sound.name, callback_data=f"play_sound:{sound.name}")]
