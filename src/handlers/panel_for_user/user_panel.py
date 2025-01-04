@@ -31,10 +31,10 @@ async def add_new_sound_prompt(message: Message, state: FSMContext):
         "Пожалуйста, назовите ваш звук (не более 20 символов).",
         reply_markup=users_menu
     )
-    await state.set_state(FSM_Prompt.get_prompt_name)
+    await state.set_state(FSM_Prompt.get_user_prompt_name)
 
 
-@router.message(F.text, FSM_Prompt.get_prompt_name)
+@router.message(F.text, FSM_Prompt.get_user_prompt_name)
 @logger.catch
 async def receive_sound_name(message: Message, state: FSMContext):
     sound_name = message.text
@@ -49,10 +49,10 @@ async def receive_sound_name(message: Message, state: FSMContext):
     
     await state.update_data(sound_name=sound_name)
     await message.answer("Теперь отправь аудио файл.")
-    await state.set_state(FSM_Prompt.get_prompt_file)
+    await state.set_state(FSM_Prompt.get_user_prompt_file)
 
 
-@router.message(F.audio | F.voice | F.document, FSM_Prompt.get_prompt_file)
+@router.message(F.audio | F.voice | F.document, FSM_Prompt.get_user_prompt_file)
 @logger.catch
 async def save_sound(message: Message, state: FSMContext):
     try:
