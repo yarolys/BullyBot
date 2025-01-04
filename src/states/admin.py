@@ -24,3 +24,7 @@ class FSM_Prompt(StatesGroup):
     get_prompt_name = State()
     working_with_prompts = State()
     get_prompt_file = State()
+    delete_user_prompt = State()
+    get_user_prompt_name = State()
+    working_user_with_prompts = State()
+    get_user_prompt_file = State()
