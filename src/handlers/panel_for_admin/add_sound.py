@@ -78,7 +78,7 @@ async def save_sound(message: Message, state: FSMContext):
 @logger.catch
 async def send_voice(callback: CallbackQuery):
     sound_id = callback.data.split("voice_")[1]
-    sound = await DbSound.get_sound_by_id(sound_id)
+    sound = await DbSound.get_sound_by_file_id(sound_id)
     if sound:
         await callback.message.answer_audio(sound.file_id)
     else:

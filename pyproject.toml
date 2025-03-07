@@ -47,6 +47,7 @@ yarl = "1.18.3"
 loguru = "^0.7.3"
 asyncpg = "^0.30.0"
 pydub = "^0.25.1"
+asgiref = "^3.8.1"
 
 [build-system]
 requires = ["poetry-core"]
