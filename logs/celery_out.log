@@ -18,3 +18,5 @@
   . src.handlers.audio.celery_cfg.handle_task_result
   . src.handlers.audio.celery_cfg.process_voice_task
 
+
+worker: Warm shutdown (MainProcess)
