@@ -1,0 +1,5 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+2025-03-21 11:33:50.960 | INFO     | __main__:main:39 - Бот запущен: https://t/me/BulyaUwU_bot
+2025-03-21 11:35:10.302 | DEBUG    | src.handlers.panel_for_admin.admin_panel:admin_panel:16 - ID Пользователя: 972773949
+2025-03-21 11:35:10.587 | DEBUG    | src.handlers.panel_for_admin.admin_panel:admin_panel:22 - Пользователь Ярослав вошел в админ панель

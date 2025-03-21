@@ -18,39 +18,26 @@ services:
       retries: 5
     restart: always
 
-
   redis:
     image: redis:7.0-alpine
     container_name: redis
     ports:
       - "6379:6379"
     restart: always
-    
-    
-  bot:
-    command: sh -c "alembic upgrade head && python3 run.py"
+
+  app:
     build: .
     env_file:
       - .env
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
     volumes:
       - ./logs:/app/logs
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
     restart: always
-
-
-  celery:
-    build:
-      context: .
-    command: celery -A src.handlers.audio.celery_cfg.app worker --loglevel=info --pool=solo
-    volumes:
-      - .:/app
-    working_dir: /app
-    depends_on:
-      - redis
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0

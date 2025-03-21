@@ -1,0 +1,36 @@
+/usr/local/lib/python3.12/site-packages/celery/platforms.py:829: SecurityWarning: You're running the worker with superuser privileges: this is
+absolutely not recommended!
+
+Please specify a different user using the --uid option.
+
+User information: uid=0 euid=0 gid=0 egid=0
+
+  warnings.warn(SecurityWarning(ROOT_DISCOURAGED.format(
+[2025-03-21 11:33:46,962: WARNING/MainProcess] /usr/local/lib/python3.12/site-packages/celery/worker/consumer/consumer.py:508: CPendingDeprecationWarning: The broker_connection_retry configuration setting will no longer determine
+whether broker connection retries are made during startup in Celery 6.0 and above.
+If you wish to retain the existing behavior for retrying connections on startup,
+you should set broker_connection_retry_on_startup to True.
+  warnings.warn(
+
+[2025-03-21 11:33:46,969: INFO/MainProcess] Connected to redis://redis:6379/0
+[2025-03-21 11:33:46,969: WARNING/MainProcess] /usr/local/lib/python3.12/site-packages/celery/worker/consumer/consumer.py:508: CPendingDeprecationWarning: The broker_connection_retry configuration setting will no longer determine
+whether broker connection retries are made during startup in Celery 6.0 and above.
+If you wish to retain the existing behavior for retrying connections on startup,
+you should set broker_connection_retry_on_startup to True.
+  warnings.warn(
+
+[2025-03-21 11:33:46,975: INFO/MainProcess] mingle: searching for neighbors
+[2025-03-21 11:33:47,991: INFO/MainProcess] mingle: all alone
+[2025-03-21 11:33:48,021: INFO/MainProcess] celery@7e611ccac907 ready.
+[2025-03-21 11:34:59,484: INFO/MainProcess] Task src.handlers.audio.celery_cfg.process_voice_task[305495d7-0707-4e9b-88c2-1a317c46e3de] received
+2025-03-21 11:34:59.954 | INFO     | src.handlers.audio.celery_cfg:process_voice_task:24 - File info: {'ok': True, 'result': {'file_id': 'AwACAgIAAxkBAAIIFGfdTuPKkXPi7NWmwzQNmR6YYTNaAALlaAACCRXwSoMoiwXzj6HwNgQ', 'file_unique_id': 'AgAD5WgAAgkV8Eo', 'file_size': 6458, 'file_path': 'voice/file_163.oga'}}
+2025-03-21 11:34:59.955 | INFO     | src.handlers.audio.celery_cfg:process_voice_task:30 - File path: voice/file_163.oga
+[2025-03-21 11:35:01,649: INFO/MainProcess] Task src.handlers.audio.celery_cfg.process_voice_task[305495d7-0707-4e9b-88c2-1a317c46e3de] succeeded in 2.1641548900006455s: {'status': 'success', 'text': 'Привет Как дела', 'chat_id': 972773949}
+[2025-03-21 11:35:01,653: INFO/MainProcess] Task src.handlers.audio.celery_cfg.handle_task_result[43d66a4c-6b68-4103-b18f-bdba17845ecc] received
+[2025-03-21 11:35:02,279: INFO/MainProcess] Task src.handlers.audio.celery_cfg.handle_task_result[43d66a4c-6b68-4103-b18f-bdba17845ecc] succeeded in 0.6254012109984615s: None
+[2025-03-21 11:35:07,335: INFO/MainProcess] Task src.handlers.audio.celery_cfg.process_voice_task[5f2099a5-0596-4aa1-9302-b9954af8543d] received
+2025-03-21 11:35:07.808 | INFO     | src.handlers.audio.celery_cfg:process_voice_task:24 - File info: {'ok': True, 'result': {'file_id': 'AwACAgIAAxkBAAIIF2fdTuv1KRN4JcbxrIDwMmP0a5gXAALmaAACCRXwSq3jbA_AZ_S3NgQ', 'file_unique_id': 'AgAD5mgAAgkV8Eo', 'file_size': 8464, 'file_path': 'voice/file_164.oga'}}
+2025-03-21 11:35:07.808 | INFO     | src.handlers.audio.celery_cfg:process_voice_task:30 - File path: voice/file_164.oga
+[2025-03-21 11:35:09,270: INFO/MainProcess] Task src.handlers.audio.celery_cfg.process_voice_task[5f2099a5-0596-4aa1-9302-b9954af8543d] succeeded in 1.9348418450008467s: {'status': 'success', 'text': 'Привет Как дела', 'chat_id': 972773949}
+[2025-03-21 11:35:09,275: INFO/MainProcess] Task src.handlers.audio.celery_cfg.handle_task_result[4b5aa435-133f-4139-8d90-23147f8985ac] received
+[2025-03-21 11:35:09,760: INFO/MainProcess] Task src.handlers.audio.celery_cfg.handle_task_result[4b5aa435-133f-4139-8d90-23147f8985ac] succeeded in 0.48524207799891883s: None
