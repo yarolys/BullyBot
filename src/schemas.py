@@ -41,4 +41,4 @@ class SoundSchema(BaseModel):
     name: str
     file_id: str  
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True) # test ci/cd
