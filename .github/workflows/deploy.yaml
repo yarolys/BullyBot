@@ -1,0 +1,73 @@
+name: 🚀 Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 Start deployment notification
+        run: |
+          curl -X POST \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
+              "text": "🚀 Deployment started!\n📦 Repository: ${{ github.repository }}\n🌿 Branch: ${{ github.ref }}",
+              "disable_notification": false
+            }' \
+            https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
+
+      - name: 📂 Checkout code
+        uses: actions/checkout@v2
+
+      - name: ℹ️ Send commit details
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          COMMIT_AUTHOR=$(git log -1 --pretty=%an)
+          curl -X POST \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
+              "text": "📝 Commit message:\n'"$COMMIT_MSG"'\n\n👤 Author: '"$COMMIT_AUTHOR"'",
+              "parse_mode": "HTML",
+              "disable_web_page_preview": true
+            }' \
+            https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
+
+      - name: 🔑 Install SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: ⚙️ Run deployment commands
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{secrets.LOGIN}}@${{secrets.HOST}} \
+            "cd ${{ secrets.PROJECT_PATH }} && git pull && docker compose up --build -d"
+
+      - name: ✅ Success notification
+        if: success()
+        run: |
+          curl -X POST \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
+              "text": "✅ Deployment successful!\n🕒 Duration: ${{ job.steps[*].continue_on_error }}s",
+              "parse_mode": "HTML"
+            }' \
+            https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
+
+      - name: ❌ Failure notification
+        if: failure()
+        run: |
+          curl -X POST \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
+              "text": "❌ Deployment failed!\n⚠️ Check workflow for details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+              "parse_mode": "HTML"
+            }' \
+            https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage

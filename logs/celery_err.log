@@ -34,3 +34,9 @@ you should set broker_connection_retry_on_startup to True.
 [2025-03-21 11:35:09,270: INFO/MainProcess] Task src.handlers.audio.celery_cfg.process_voice_task[5f2099a5-0596-4aa1-9302-b9954af8543d] succeeded in 1.9348418450008467s: {'status': 'success', 'text': 'Привет Как дела', 'chat_id': 972773949}
 [2025-03-21 11:35:09,275: INFO/MainProcess] Task src.handlers.audio.celery_cfg.handle_task_result[4b5aa435-133f-4139-8d90-23147f8985ac] received
 [2025-03-21 11:35:09,760: INFO/MainProcess] Task src.handlers.audio.celery_cfg.handle_task_result[4b5aa435-133f-4139-8d90-23147f8985ac] succeeded in 0.48524207799891883s: None
+[2025-03-21 11:44:39,712: INFO/MainProcess] Task src.handlers.audio.celery_cfg.process_voice_task[492b0576-5e37-4996-a2b2-818f3a7eb25d] received
+2025-03-21 11:44:40.215 | INFO     | src.handlers.audio.celery_cfg:process_voice_task:24 - File info: {'ok': True, 'result': {'file_id': 'AwACAgIAAxkBAAIIHmfdUScBgVogMn36INp_2JxL6BrkAAIFaQACCRXwSuKHqZ7SbRUONgQ', 'file_unique_id': 'AgADBWkAAgkV8Eo', 'file_size': 6146, 'file_path': 'voice/file_165.oga'}}
+2025-03-21 11:44:40.216 | INFO     | src.handlers.audio.celery_cfg:process_voice_task:30 - File path: voice/file_165.oga
+[2025-03-21 11:44:41,500: INFO/MainProcess] Task src.handlers.audio.celery_cfg.process_voice_task[492b0576-5e37-4996-a2b2-818f3a7eb25d] succeeded in 1.7874109229996975s: {'status': 'success', 'text': 'Привет Как дела', 'chat_id': 972773949}
+[2025-03-21 11:44:41,506: INFO/MainProcess] Task src.handlers.audio.celery_cfg.handle_task_result[6c421791-14a6-481e-b4fa-ce6d24e84446] received
+[2025-03-21 11:44:42,028: INFO/MainProcess] Task src.handlers.audio.celery_cfg.handle_task_result[6c421791-14a6-481e-b4fa-ce6d24e84446] succeeded in 0.5214214170009654s: None
