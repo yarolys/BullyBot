@@ -8,12 +8,11 @@ from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from src.utils.filter import AdminRoleFilter
 from src.states.admin import FSM_StaticButtons
 from src.utils.keyboard.admin import get_buttons_for_delete, get_buttons_kb, \
-working_with_buttons_kb, admin_panel_kb, main_menu
+    working_with_buttons_kb, admin_panel_kb, main_menu
 from src.utils.keyboard.join2group import welcome_keyboard
 from src.database.models import DbButton
 from src.config import logger
 from src.schemas import ButtonTypeEnum as BTE
-
 
 router = Router()
 
@@ -84,7 +83,7 @@ async def prepare_static_buttons(message: Message, state: FSMContext):
     await state.set_state(FSM_StaticButtons.delete_buttons)
     r = await message.answer(
         'Удалить лишние кнопки',
-        reply_markup=(await get_buttons_for_delete(dynamic=True))
+        reply_markup=(await get_buttons_for_delete(static=True))
     )
     await asyncio.sleep(15)
     await r.delete()
@@ -97,7 +96,7 @@ async def prepare_static_buttons(message: Message, state: FSMContext):
 async def delete_static_buttons(qq: CallbackQuery):
     await DbButton.delete_button(int(qq.data))
     await qq.message.edit_reply_markup(
-        reply_markup=(await get_buttons_for_delete(dynamic=True))
+        reply_markup=(await get_buttons_for_delete(static=True))
     )
 
 
@@ -131,15 +130,15 @@ async def get_button_name(message: Message, state: FSMContext):
     if len(button_url) > 44:
         await message.answer('Слишком длинная ссылка')
         return
-    if not(button_url.startswith(('https://', 'http://'))):
+    if not (button_url.startswith(('https://', 'http://'))):
         await message.answer('Неверная ссылка, она должна начинаться с http:// или https://')
         return
-    
+
     is_accessible = await check_url_accesibility(button_url)
     if not is_accessible:
         await message.answer("Ссылка недоступна или ведет на несуществующий ресурс.")
         return
-    
+
     await DbButton.add_button(
         name=(await state.get_data()).get('button_name'),
         url=button_url,
@@ -157,7 +156,3 @@ async def get_button_name(message: Message, state: FSMContext):
     )
 
     await state.set_state(FSM_StaticButtons.working_with_buttons)
-
-
-
-
