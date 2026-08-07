@@ -184,3 +184,6 @@ log.log
 *.db
 *.env
 /test.py
+# Логи и временные медиафайлы
+logs/
+*.ogg
