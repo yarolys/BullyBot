@@ -1,3 +1,4 @@
+from html import escape
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
@@ -37,8 +38,8 @@ async def add_new_sound_prompt(message: Message, state: FSMContext):
 @router.message(F.text, FSM_Prompt.get_user_prompt_name)
 @logger.catch
 async def receive_sound_name(message: Message, state: FSMContext):
-    sound_name = message.text
-    if len(sound_name) > 20:
+    sound_name = message.text.strip()
+    if not sound_name or len(sound_name) > 20:
         await message.answer("Название звука не может превышать 20 символов. Попробуйте снова.")
         return
     
@@ -56,6 +57,9 @@ async def receive_sound_name(message: Message, state: FSMContext):
 @logger.catch
 async def save_sound(message: Message, state: FSMContext):
     try:
+        if message.document and not (message.document.mime_type or '').startswith('audio/'):
+            await message.answer('Пришли аудиофайл или голосовое сообщение.')
+            return
         data = await state.get_data()
         sound_name = data.get("sound_name")
         file_id = message.audio.file_id if message.audio else \
@@ -69,21 +73,11 @@ async def save_sound(message: Message, state: FSMContext):
             return
         
 
-        await DbSound.add_sound(name=sound_name, file_id=file_id)
-        await message.answer(f"Звук '{sound_name}' успешно добавлен!", reply_markup=users_menu)
+        await DbSound.add_sound(name=sound_name, file_id=file_id,
+                                media_type='audio' if message.audio else 'voice' if message.voice else 'document')
+        await message.answer(f"Звук '{escape(sound_name)}' успешно добавлен!", reply_markup=users_menu)
         await state.clear()
     except Exception as e:
         logger.error(f"Ошибка при сохранении звука: {e}")
         await message.answer("Произошла ошибка. Попробуйте снова.")
         await state.clear()
-
-
-@router.callback_query(F.data.startswith("voice_"))
-@logger.catch
-async def send_voice(callback: CallbackQuery):
-    sound_id = callback.data.split("voice_")[1]
-    sound = await DbSound.get_sound_by_id(sound_id)
-    if sound:
-        await callback.message.answer_audio(sound.file_id)
-    else:
-        await callback.message.answer("Звук не найден.")

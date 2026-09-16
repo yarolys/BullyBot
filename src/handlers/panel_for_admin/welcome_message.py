@@ -11,6 +11,8 @@ from src.utils.welcome_message import configure_welcome_message
 from src.database.models import DbSettings
 
 router = Router()
+router.message.filter(AdminRoleFilter())
+router.callback_query.filter(AdminRoleFilter())
 
 @router.message(F.text == 'Посмотреть приветственное сообщение', AdminRoleFilter())
 async def get_welcome_message(message: Message, state: FSMContext):
@@ -56,9 +58,12 @@ async def send_amount_of_buttons(message: Message, state: FSMContext):
 async def get_amount_of_dynamic_buttons(message: Message, state: FSMContext):
     try:
         amount = int(message.text)
-    except ValueError:
+    except (ValueError, TypeError):
         await message.answer('Неверный формат')
         await message.answer('Пришлите мне количество динамических кнопок (числом)')
+        return
+    if not 0 <= amount <= 100:
+        await message.answer('Укажи число от 0 до 100.')
         return
     await DbSettings.set_settings(dynamic_button_count=amount)
     await message.answer(f'Установлено <b>{amount}</b> динамических кнопок для сообщения')

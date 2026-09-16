@@ -3,7 +3,7 @@ name = "bullybot"
 version = "0.1.0"
 description = "This is a bot description"
 authors = ["yarolys <lysov.yaroslav.r@mail.ru>"]
-readme = ""
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -46,8 +46,10 @@ wcwidth = "0.2.13"
 yarl = "1.18.3"
 loguru = "^0.7.3"
 asyncpg = "^0.30.0"
+sqlalchemy = "^2.0.38"
 pydub = "^0.25.1"
 asgiref = "^3.8.1"
+requests = "^2.32.5"
 
 [build-system]
 requires = ["poetry-core"]

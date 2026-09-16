@@ -6,6 +6,8 @@ from src.database.models.sound import Sound
 from src.config import logger
 from src.utils.keyboard.admin import del_audio_kb
 router = Router()
+router.message.filter(AdminRoleFilter())
+router.callback_query.filter(AdminRoleFilter())
 
 
 async def get_sounds_keyboard():

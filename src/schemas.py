@@ -39,6 +39,7 @@ from pydantic.config import ConfigDict
 class SoundSchema(BaseModel):
     id: int
     name: str
-    file_id: str  
+    file_id: str
+    media_type: str = 'audio'
 
     model_config = ConfigDict(from_attributes=True) # test ci/cd

@@ -16,6 +16,8 @@ from src.schemas import ButtonTypeEnum as BTE
 
 
 router = Router()
+router.message.filter(AdminRoleFilter())
+router.callback_query.filter(AdminRoleFilter())
 
 
 async def check_url_accesibility(url: str) -> bool:

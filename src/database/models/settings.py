@@ -43,12 +43,12 @@ class Settings(Base):
        """
         async with async_session_maker() as session:
             if await session.get(cls, 1):
-                if not (dynamic_button_count or welcome_message):
+                if dynamic_button_count is None and welcome_message is None:
                     return
                 query = update(cls).where(cls.id == 1)
-                if dynamic_button_count:
+                if dynamic_button_count is not None:
                     query = query.values(dynamic_button_count=dynamic_button_count)
-                if welcome_message:
+                if welcome_message is not None:
                     query = query.values(
                         welcome_message=welcome_message)
                 await session.execute(

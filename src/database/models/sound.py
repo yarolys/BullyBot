@@ -9,10 +9,11 @@ class Sound(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(unique=True, nullable=False)
-    file_id: Mapped[str] = mapped_column(nullable=False)  
+    file_id: Mapped[str] = mapped_column(nullable=False)
+    media_type: Mapped[str] = mapped_column(nullable=False, default='audio', server_default='audio')
 
     @classmethod
-    async def add_sound(cls, name: str, file_id: str) -> SoundSchema:
+    async def add_sound(cls, name: str, file_id: str, media_type: str = 'audio') -> SoundSchema:
         """
         Добавляет новый звук в базу данных.
 
@@ -29,7 +30,7 @@ class Sound(Base):
             Объект, представляющий добавленный звук.
         """
         async with async_session_maker() as session:
-            new_sound = cls(name=name, file_id=file_id)
+            new_sound = cls(name=name, file_id=file_id, media_type=media_type)
             session.add(new_sound)
             await session.commit()
             await session.refresh(new_sound)
@@ -133,3 +134,9 @@ class Sound(Base):
         async with async_session_maker() as session:
             await session.execute(delete(cls).where(cls.id == sound_id))
             await session.commit()
+
+    @classmethod
+    async def get_sound_by_id(cls, sound_id: int) -> SoundSchema | None:
+        async with async_session_maker() as session:
+            sound = await session.get(cls, sound_id)
+            return SoundSchema.model_validate(sound) if sound else None
