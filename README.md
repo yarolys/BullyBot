@@ -105,3 +105,6 @@ poetry run alembic upgrade head --sql
 - Зависимости закреплены на старых версиях; крупное обновление aiogram требует отдельной проверки.
 
 Правила Telegram API: https://core.telegram.org/bots/api
+
+Для Telegram через HTTP-прокси задайте `TELEGRAM_PROXY_URL=http://user:password@host:port` в `.env`.
+Прокси используется ботом и Celery для Telegram API и скачивания файлов; TLS-проверка сохраняется.

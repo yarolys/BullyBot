@@ -14,3 +14,6 @@ AUTO_MUTE_WORDS=
 AUTO_MUTE_SECONDS=600
 VOICE_RECOGNITION_ENABLED=true
 REDIS_URL=redis://localhost:6379/0
+
+# Optional HTTP proxy for Telegram requests (bot and Celery).
+TELEGRAM_PROXY_URL=

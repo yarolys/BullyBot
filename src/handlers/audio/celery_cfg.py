@@ -15,6 +15,9 @@ app.conf.update(result_backend=REDIS_URL, result_expires=3600,
                 broker_connection_timeout=5, task_publish_retry=False,
                 task_soft_time_limit=120, task_time_limit=150)
 
+PROXY_URL = os.getenv("TELEGRAM_PROXY_URL")
+TELEGRAM_PROXIES = {"http": PROXY_URL, "https": PROXY_URL} if PROXY_URL else {}
+
 TOKEN = os.getenv("TOKEN")
 if not TOKEN:
     raise ValueError("TOKEN не установлен в переменных окружения")
@@ -24,7 +27,7 @@ def send_telegram_message(chat_id: int, text: str) -> None:
     """Отправка сообщения в Telegram с логированием ошибок."""
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     try:
-        resp = requests.post(url, json={"chat_id": chat_id, "text": text}, timeout=10)
+        resp = requests.post(url, json={"chat_id": chat_id, "text": text}, timeout=10, proxies=TELEGRAM_PROXIES)
         if not resp.ok:
             logger.error(
                 "Не удалось отправить сообщение в Telegram. "
@@ -38,7 +41,7 @@ def get_telegram_file_path(file_id: str) -> str:
     """Возвращает file_path для voice-файла в Telegram."""
     url = f"https://api.telegram.org/bot{TOKEN}/getFile"
     try:
-        resp = requests.get(url, params={"file_id": file_id}, timeout=10)
+        resp = requests.get(url, params={"file_id": file_id}, timeout=10, proxies=TELEGRAM_PROXIES)
         resp.raise_for_status()
     except requests.RequestException as e:
         logger.error(f"Ошибка при запросе getFile: {type(e).__name__}")
@@ -57,7 +60,7 @@ def download_telegram_file(file_path: str) -> str:
     """Скачивает файл Telegram во временный .ogg и возвращает путь к нему."""
     file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_path}"
     try:
-        resp = requests.get(file_url, timeout=30)
+        resp = requests.get(file_url, timeout=30, proxies=TELEGRAM_PROXIES)
         resp.raise_for_status()
     except requests.RequestException as e:
         logger.error(f"Ошибка при скачивании файла: {type(e).__name__}")

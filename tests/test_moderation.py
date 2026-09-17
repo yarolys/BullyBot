@@ -1,4 +1,5 @@
 import os
+os.environ['TELEGRAM_PROXY_URL'] = ''
 os.environ['TOKEN'] = '123456:offline-test-token'
 os.environ['BOT_ADMIN_ID'] = '1'
 os.environ['DATABASE_URL'] = 'postgresql+asyncpg://test:test@localhost/test'
