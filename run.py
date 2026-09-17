@@ -40,9 +40,9 @@ async def main():
         voice_router,
 
     )
-    r = await bot.get_me()
-    logger.info(f"Бот запущен: https://t.me/{r.username}")
     try:
+        r = await bot.get_me()
+        logger.info(f"Бот запущен: https://t.me/{r.username}")
         await dp.start_polling(bot)
     finally:
         await engine.dispose()

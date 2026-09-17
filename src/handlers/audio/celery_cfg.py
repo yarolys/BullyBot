@@ -12,7 +12,8 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
 app = Celery("audio_recognition", broker=REDIS_URL)
 app.conf.update(result_backend=REDIS_URL, result_expires=3600,
-                broker_connection_timeout=5, task_publish_retry=False,
+                broker_connection_timeout=5, broker_connection_retry_on_startup=True,
+                task_publish_retry=False,
                 task_soft_time_limit=120, task_time_limit=150)
 
 PROXY_URL = os.getenv("TELEGRAM_PROXY_URL")
